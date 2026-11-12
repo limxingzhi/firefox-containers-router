@@ -1,0 +1,64 @@
+# This is my actual compose file
+
+x-keys:
+  tailscale: &tailscale tailscale/tailscale:v1.104.4
+
+x-tailscale-ff-env: &tailscale-ff-env
+  # tailscale firefox container routing key
+  TS_AUTHKEY: tskey-auth-*****
+  TS_STATE_DIR: /var/lib/tailscale
+  TS_USERSPACE: false
+  TS_SERVE_CONFIG: /config/serve-config.json
+
+x-container-ff: &container-ff
+  # <<: *ts-common
+  image: *tailscale
+  devices:
+    - /dev/net/tun
+  cap_add:
+    - net_admin
+  restart: unless-stopped
+  networks:
+    - ff_router_net
+
+services:
+
+  ff1_tailscale:
+    <<: *container-ff
+    environment:
+      <<: *tailscale-ff-env
+      TS_HOSTNAME: ff1
+    container_name: ff1_tailscale
+    volumes:
+      - ff1_ts_state:/var/lib/tailscale
+      - "/volume1/docker/ff_router/serve-config.ff1.json:/config/serve-config.json:ro"
+
+  ff2_tailscale:
+    <<: *container-ff
+    environment:
+      <<: *tailscale-ff-env
+      TS_HOSTNAME: ff2
+    container_name: ff2_tailscale
+    volumes:
+      - ff2_ts_state:/var/lib/tailscale
+      - "/volume1/docker/ff_router/serve-config.ff2.json:/config/serve-config.json:ro"
+
+  ff_router:
+    image: ghcr.io/limxingzhi/firefox-containers-router:latest
+    container_name: ff_router
+    networks:
+      - ff_router_net
+    
+networks:
+  ff_router_net:
+    name: ff_router_net
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+    ipam:
+      config:
+        - subnet: 172.22.2.0/24
+
+volumes:
+  ff1_ts_state:
+  ff2_ts_state:
