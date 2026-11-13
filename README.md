@@ -2,6 +2,8 @@
 
 This is a small redirect service that sends links into Firefox containers. It sits on the a docker network next to Tailscale sidecars, and each sidecar answers on its own hostname such as `ff1` or `ff2`.
 
+Ref: [Firefox containers extension](https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/)
+
 ## Routes
 
 - `/route?route=<url>`
