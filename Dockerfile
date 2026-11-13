@@ -1,18 +1,15 @@
-FROM node:26-alpine AS build
+FROM oven/bun:1-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-COPY tsconfig.json ./
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 COPY src ./src
-RUN npm run build
+RUN bun run build
 
-FROM node:26-alpine
+FROM oven/bun:1-alpine
 ENV NODE_ENV=production
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
-COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=bun:bun /app/dist ./dist
 ENV PORT=3000
 EXPOSE 3000
-USER node
-CMD ["node", "dist/index.js"]
+USER bun
+CMD ["bun", "dist/index.js"]

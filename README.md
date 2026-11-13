@@ -18,8 +18,8 @@ Assuming you are using tailscale DNS and your domain is at `ff1`. Open `http://f
 ## Run locally
 
 ```
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Then try http://localhost:3000/route?route=https://example.com.
@@ -28,7 +28,7 @@ Then try http://localhost:3000/route?route=https://example.com.
 
 `compose.yaml` starts the router and two Tailscale sidecars. Set `TS_AUTHKEY` in the file first, since the checked in value is redacted. Each sidecar mounts a serve config from `/volume1/docker/ff_router/serve-config.ff1.json` or the `ff2` equivalent.
 
-The image comes from `ghcr.io/limxingzhi/firefox-containers-router`. The build workflow pushes it on each push to `main`.
+The image comes from `ghcr.io/limxingzhi/firefox-containers-router`. The build workflow pushes `latest` and a date tag on each push to `main`, and `dev` plus a `dev-<date>` tag on each push to `dev`.
 
 `compose.yaml` is my actual compose file for deploying this service.
 
